@@ -1,0 +1,54 @@
+from openai import OpenAI
+import numpy as np
+
+client = client = OpenAI(api_key="openAI-api-key")
+
+
+document_chunks = [
+    "Pod-level chaos scenarios are critical to test because they help validate the resilience and high availability of Kubernetes workloads. By simulating different failure modes at the pod level, you can ensure your system recovers gracefully and continues to serve customers without interruption.",
+    
+    "This use case simulates the unplanned deletion of a single pod. It is important because it validates whether the ReplicaSet or Deployment automatically creates a replacement pod after a failure. The customer impact is minimal as continuous service is ensured even if a pod crashes unexpectedly. Recovery time is typically under 10 seconds for stateless applications, as seen in Krkn telemetry data. High availability is indicated when the pod is automatically rescheduled and becomes Ready without manual intervention.",
+    
+    "To test single pod deletion, use: `kubectl delete pod <pod-name>` to delete the specified pod, and `kubectl get pods` to watch for new pods being created and becoming Ready.",
+    
+    "This scenario simulates a larger failure event, such as a node crash or availability zone outage. It is important to test whether the system has sufficient resources and policies to recover gracefully. Customer impact is more significant since failure of all pods of a service directly affects user experience. High availability is indicated if the application continues functioning from replicas across other zones or nodes.",
+    
+    "Pod eviction is triggered by Kubernetes during node upgrades or scaling operations. This scenario is important to ensure graceful termination and restart of pods elsewhere with zero user impact. If readiness and liveness probes along with Pod Disruption Budgets (PDBs) are configured correctly, customer impact should be zero. High availability means rolling disruptions do not bring down the entire application.",
+    
+    "Indicators of high availability include: multiple replicas exist (verified via `kubectl get deploy` showing more than one replica); pods are distributed across nodes or availability zones using topology spread constraints or `kubectl get pods -o wide`; service uptime remains unaffected during chaos tests monitored via synthetic probes or Prometheus alerts; recovery happens automatically with no manual intervention; and Krkn telemetry reports recovery times, pod reschedule latency, and service downtime metrics to assess HA."
+]
+
+#embeds the words into vectors
+def get_embedding(text, model="text-embedding-ada-002"):
+    response = client.embeddings.create(input=text, model=model)
+    return response.data[0].embedding
+
+# the embeddings of the document chunks (the context/knowledge)
+chunk_embeddings = [get_embedding(chunk) for chunk in document_chunks]
+
+#compares the similarity between two embeddings
+#used to compare the embeddings of the user input question and the document chunk embeddings
+def cosine_similarity(a, b):
+    return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
+
+#uses the above function to find the most similar document chunk
+def find_most_similar_chunk(question, chunk_embeddings, document_chunks):
+    question_embedding = get_embedding(question)
+    similarities = [cosine_similarity(question_embedding, chunk_emb) for chunk_emb in chunk_embeddings]
+    best_idx = np.argmax(similarities)
+    return document_chunks[best_idx]
+
+#generates the answer using the openAI model
+def generate_answer(question, context):
+    prompt = f"Use the following context to answer the question.\nContext: {context}\nQuestion: {question}\nAnswer:"
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[{"role": "user", "content": prompt}],
+    )
+    return response.choices[0].message.content.strip()
+
+if __name__ == "__main__":
+    user_question = input("Ask a question: ")
+    context = find_most_similar_chunk(user_question, chunk_embeddings, document_chunks)
+    answer = generate_answer(user_question, context)
+    print("Answer:", answer)
