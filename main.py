@@ -25,8 +25,9 @@ vector_store = Chroma.from_documents(documents=all_splits, embedding=embedding_m
 prompt = hub.pull("rlm/rag-prompt")
 
 # load LLM (chat model)
-llm = ChatOpenAI(model="gpt-4o", temperature=0, openai_api_key= "openAI-api-key" )
-
+#llm = ChatOpenAI(model="gpt-4o", temperature=0, openai_api_key= "openAI-api-key" )
+# Load the model
+llm = Llama(model_path=model_path)
 # Define state for application
 class State(TypedDict):
     question: str
