@@ -3,12 +3,16 @@ from langchain_community.document_loaders import PyPDFLoader
 from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import Chroma
-from langchain_community.embeddings import HuggingFaceEmbeddings
+#from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.chat_models import ChatOpenAI
 from langgraph.graph import START, StateGraph
 from typing_extensions import List, TypedDict
+from langchain_community.llms import LlamaCpp
+from langchain_huggingface import HuggingFaceEmbeddings
 
-# load and chunk contents of the PDF
+
+
+# load and chunk contents of thepytohnPDF
 loader = PyPDFLoader("data/pod_scenarios.pdf")
 docs = loader.load()
 
@@ -25,9 +29,14 @@ vector_store = Chroma.from_documents(documents=all_splits, embedding=embedding_m
 prompt = hub.pull("rlm/rag-prompt")
 
 # load LLM (chat model)
-#llm = ChatOpenAI(model="gpt-4o", temperature=0, openai_api_key= "openAI-api-key" )
+#lm = ChatOpenAI(model="gpt-4o", temperature=0, openai_api_key= "openAI-api-key" )
 # Load the model
-llm = Llama(model_path=model_path)
+llm = LlamaCpp(
+    model_path="./models/llama-2-7b-chat.Q4_K_M.gguf",
+    n_ctx=2048,
+    n_gpu_layers=1,  
+)
+
 # Define state for application
 class State(TypedDict):
     question: str
@@ -43,7 +52,7 @@ def generate(state: State):
     docs_content = "\n\n".join(doc.page_content for doc in state["context"])
     messages = prompt.invoke({"question": state["question"], "context": docs_content})
     response = llm.invoke(messages)
-    return {"answer": response.content}
+    return {"answer": response}
 
 # Compile the graph
 graph_builder = StateGraph(State).add_sequence([retrieve, generate])
