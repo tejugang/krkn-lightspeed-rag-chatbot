@@ -72,14 +72,14 @@ def generate(state: State):
     docs_content = "\n\n".join(doc.page_content for doc in state["context"])
     messages = prompt.invoke({"question": state["question"], "context": docs_content})
 
-    # Convert ChatPromptValue to plain text prompt
+    # convert ChatPromptValue to plain text prompt
     if hasattr(messages, "to_messages"):  # it's a ChatPromptValue
         chat_messages = messages.to_messages()
         prompt_str = "\n".join([m.content for m in chat_messages])
     else:
         raise ValueError("Unexpected message format")
 
-    # Tokenize and run the Granite model
+    # tokenize and run the Granite model
     input_tokens = tokenizer(prompt_str, return_tensors="pt").to(model.device)
     output_tokens = model.generate(**input_tokens, max_new_tokens=512)
     response = tokenizer.decode(output_tokens[0], skip_special_tokens=True)
