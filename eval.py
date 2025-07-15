@@ -10,11 +10,16 @@ from typing_extensions import List, TypedDict
 from langchain_community.llms import LlamaCpp
 from langchain_huggingface import HuggingFaceEmbeddings
 import time
+import torch
+from transformers import AutoModelForCausalLM, AutoTokenizer
+from langchain_community.llms import Ollama
 
+#delete
 import json
 
 
 # load and chunk contents of thepytohnPDF
+
 loader1 = PyPDFLoader("data/pod_scenarios.pdf")
 loader2 = PyPDFLoader("data/Pod-Scenarios-using-Krknctl.pdf")
 loader3 = PyPDFLoader("data/Pod-Scenarios-using-Krkn-hub.pdf")
@@ -25,9 +30,8 @@ docs2 = loader2.load()
 docs3 = loader3.load()
 docs4 = loader4.load()
 
-
 text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
-all_splits = text_splitter.split_documents(docs1 + docs2 + docs3 + docs4)
+all_splits = text_splitter.split_documents(docs1 + docs2+ docs3+ docs4)
 
 # embed and store in vector database
 embedding_model = HuggingFaceEmbeddings(model_name="Qwen/Qwen3-Embedding-0.6B")
@@ -39,14 +43,32 @@ vector_store = Chroma.from_documents(documents=all_splits, embedding=embedding_m
 prompt = hub.pull("rlm/rag-prompt")
 
 # load LLM (chat model)
+
 #lm = ChatOpenAI(model="gpt-4o", temperature=0, openai_api_key= "openAI-api-key" )
 
-# Load the model
+
+# Load the model (llama 2.7 model)
+'''
 llm = LlamaCpp(
     model_path="./models/llama-2-7b-chat.Q4_K_M.gguf",
     n_ctx=2048,
     n_gpu_layers=1,  
 )
+'''
+#granite
+'''
+model_id = "ibm-granite/granite-3b-code-base-2k"
+device = "cuda" if torch.cuda.is_available() else "cpu"
+
+tokenizer = AutoTokenizer.from_pretrained(model_id)
+model = AutoModelForCausalLM.from_pretrained(model_id, device_map="auto" if device == "cuda" else None)
+model.to(device)
+model.eval()
+'''
+
+llm = Ollama(model="llama3.1", base_url="http://127.0.0.1:11434")
+
+
 
 # Define state for application
 class State(TypedDict):
@@ -59,20 +81,23 @@ def retrieve(state: State):
     retrieved_docs = vector_store.similarity_search(state["question"])
     return {"context": retrieved_docs}
 
+
 def generate(state: State):
     docs_content = "\n\n".join(doc.page_content for doc in state["context"])
     messages = prompt.invoke({"question": state["question"], "context": docs_content})
     response = llm.invoke(messages)
-    return {
-        "answer": response,
-        "context": state["context"]
-}
+    return {"answer": response}
 
+# llama and openaI model
+    '''
+    response = llm.invoke(messages)
+    
+    return {"answer": response}
+    '''
 # Compile the graph
 graph_builder = StateGraph(State).add_sequence([retrieve, generate])
 graph_builder.add_edge(START, "retrieve")
 graph = graph_builder.compile()
-
 
 
 
@@ -136,7 +161,7 @@ for q in questions:
     })
 
 # Save to file
-with open("rag_evaluation_data.json", "w") as f:
+with open("rag_evaluation_data2.json", "w") as f:
     json.dump(evaluation_data, f, indent=2)
 
-print("✅ Evaluation data saved to 'rag_evaluation_data.json'")
+print("Evaluation data saved to 'rag_evaluation_data2.json'")

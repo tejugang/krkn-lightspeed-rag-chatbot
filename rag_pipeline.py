@@ -7,6 +7,10 @@ from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.llms import LlamaCpp
 from langgraph.graph import START, StateGraph
 from typing_extensions import List, TypedDict
+import time
+import torch
+from transformers import AutoModelForCausalLM, AutoTokenizer
+from langchain_community.llms import Ollama
 
 class State(TypedDict):
     question: str
@@ -14,20 +18,24 @@ class State(TypedDict):
     answer: str
 
 def load_rag_pipeline():
-    loader = PyPDFLoader("data/pod_scenarios.pdf")
-    docs = loader.load()
+    loader1 = PyPDFLoader("data/pod_scenarios.pdf")
+    loader2 = PyPDFLoader("data/Pod-Scenarios-using-Krknctl.pdf")
+    loader3 = PyPDFLoader("data/Pod-Scenarios-using-Krkn-hub.pdf")
+    loader4 = PyPDFLoader("data/Pod-Scenarios-using-Krkn.pdf")
+
+    docs1 = loader1.load()
+    docs2 = loader2.load()
+    docs3 = loader3.load()
+    docs4 = loader4.load()
+
 
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
-    all_splits = text_splitter.split_documents(docs)
+    all_splits = text_splitter.split_documents(docs1 + docs2+ docs3+ docs4)
 
     embedding_model = HuggingFaceEmbeddings(model_name="Qwen/Qwen3-Embedding-0.6B")
     vector_store = Chroma.from_documents(documents=all_splits, embedding=embedding_model)
 
-    llm = LlamaCpp(
-        model_path="./models/llama-2-7b-chat.Q4_K_M.gguf",
-        n_ctx=512,
-        n_gpu_layers=1,
-    )
+    llm = Ollama(model="llama3.1", base_url="http://127.0.0.1:11434")
 
     prompt = hub.pull("rlm/rag-prompt")
 

@@ -32,5 +32,3 @@ if prompt := st.chat_input("Ask about krkn pod chaos scenarios..."):
             response = result["answer"]
             st.markdown(response)
     st.session_state.messages.append({"role": "assistant", "content": response})
-
-

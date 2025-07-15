@@ -12,3 +12,5 @@ huggingface_hub
 sentence-transformers
 tqdm
 torch
+streamlit
+pypdf
