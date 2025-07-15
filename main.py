@@ -16,8 +16,9 @@ from langchain_community.llms import Ollama
 from granite_rag_pipeline import load_granite_rag_pipline
 from llama31_rag_pipeline import load_llama31_rag_pipeline
 
-# COMMENT OUT THE MODEL THAT YOU ARE NOT USING BEFORE RUNNING
+# COMMENT OUT THE CODE FOR THE MODEL THAT YOU ARE NOT USING BEFORE RUNNING
 
+#START OF GRANITE MODEL LOGIC
 #granite
 graph = load_granite_rag_pipline()
 
@@ -35,7 +36,9 @@ while True:
 
 
     print("\nAnswer:", result["answer"])
+#END OF GRANITE MODEL LOGIC
 
+#START OF LLAMA 3.1 MODEL LOGIC
 #llama 3.1
 graph = load_llama31_rag_pipeline()
 
@@ -53,3 +56,4 @@ while True:
 
 
     print("\nAnswer:", result["answer"])
+#END OF LLAMA 3.1 MODEL LOGIC

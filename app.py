@@ -1,6 +1,7 @@
 from rag_pipeline import load_rag_pipeline
 import streamlit as st
-
+from llama31_rag_pipeline import load_llama31_rag_pipeline
+#from granite_rag_pipeline import load_granite_rag_pipline
 st.title("krkn lightspeed RAG Chatbot")
 
 # Initialize chat history
@@ -9,7 +10,8 @@ if "messages" not in st.session_state:
 
 @st.cache_resource
 def get_graph():
-    return load_rag_pipeline()
+    return load_llama31_rag_pipeline()
+    # return load_granite_rag_pipeline()
 
 graph = get_graph()
 

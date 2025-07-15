@@ -1,32 +1,24 @@
-from langchain import hub
-from langchain_community.document_loaders import PyPDFLoader
-from langchain_core.documents import Document
-from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_community.vectorstores import Chroma
-#from langchain_community.embeddings import HuggingFaceEmbeddings
-from langchain_community.chat_models import ChatOpenAI
-from langgraph.graph import START, StateGraph
-from typing_extensions import List, TypedDict
-from langchain_huggingface import HuggingFaceEmbeddings
-import time
-import torch
-from transformers import AutoModelForCausalLM, AutoTokenizer
-from granite_rag_pipeline import load_granite_rag_pipline
-from llama31_rag_pipeline import load_llama31_rag_pipeline
-
-#delete
+from rag_pipelines.granite_rag_pipeline import load_granite_rag_pipline
+from rag_pipelines.llama31_rag_pipeline import load_llama31_rag_pipeline
 import json
+import time
 
-# COMMENT OUT THE CODE FOR THE MODEL THAT YOU ARE NOT USING BEFORE RUNNING
+# UNCOMMENT THE CODE FOR THE MODEL THAT YOU ARE NOT USING BEFORE RUNNING
 
+'''#START OF GRANITE MODEL LOGIC
 #granite
 graph = load_granite_rag_pipline()
-'''
+#END OF GRANITE MODEL LOGIC'''
+
+
+
+'''# START OF LLAMA 3.1 LOGIC
 #llama 3.1
 graph = load_llama31_rag_pipeline()
-'''
+# END OF LLAMA 3.1 LOGIC'''
 
-# Your 30 questions
+
+# 30 questions
 questions = [
     "What is the primary objective of the 'Pod Scenarios' feature within Krkn-hub on a Kubernetes/OpenShift cluster?",
     "How can Cerberus be integrated with Krkn-hub's pod scenarios to monitor the cluster and determine the success or failure of a chaos injection?",
@@ -112,14 +104,16 @@ for i, q in enumerate(questions):
     end_time = time.time()
     duration = end_time - start_time
 
-    # Extract context
     retrieved_context = [doc.page_content for doc in result["context"]]
     
     evaluation_data.append({
         "user_input": q,
         "generated_answer": result["answer"],
         "retrieved_context": retrieved_context,
-       "reference_answer": reference_answers[i]
+        "reference_answer": reference_answers[i],
+        #not a part of the json structure but I would like to have this data too
+        "duration_seconds": duration
+
     })
 
 output = {
