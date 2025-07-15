@@ -128,7 +128,7 @@ output = {
 }
 
 # Save to file
-with open("rag_evaluation_data2.json", "w") as f:
+with open("rgranite_rag_evaluation_data.json", "w") as f:
     json.dump(evaluation_data, f, indent=2)
 
 print("Evaluation data saved to 'granite_rag_evaluation_data.json'")
