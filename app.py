@@ -1,7 +1,13 @@
-from rag_pipeline import load_rag_pipeline
+from rag_pipelines.rag_pipeline import load_rag_pipeline
 import streamlit as st
-from llama31_rag_pipeline import load_llama31_rag_pipeline
+from rag_pipelines.llama31_rag_pipeline import load_llama31_rag_pipeline
 #from granite_rag_pipeline import load_granite_rag_pipline
+
+'''
+Code from streamlit LLM chat documentation
+https://docs.streamlit.io/develop/tutorials/chat-and-llm-apps/build-conversational-apps
+'''
+
 st.title("krkn lightspeed RAG Chatbot")
 
 # Initialize chat history

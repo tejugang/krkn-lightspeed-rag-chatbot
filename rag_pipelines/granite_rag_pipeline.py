@@ -16,6 +16,11 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 #delete
 import json
 
+'''
+Code from langchain's Duild a RAG App documentation
+https://python.langchain.com/docs/tutorials/rag/
+'''
+
 def load_granite_rag_pipline():
     # load and chunk contents of thepytohnPDF
     loader1 = PyPDFLoader("data/pod_scenarios.pdf")

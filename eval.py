@@ -1,5 +1,7 @@
 from rag_pipelines.granite_rag_pipeline import load_granite_rag_pipline
 from rag_pipelines.llama31_rag_pipeline import load_llama31_rag_pipeline
+from rag_pipelines.llama27_rag_pipeline import load_llama27_rag_pipeline
+
 import json
 import time
 
@@ -11,11 +13,15 @@ graph = load_granite_rag_pipline()
 #END OF GRANITE MODEL LOGIC'''
 
 
-
 '''# START OF LLAMA 3.1 LOGIC
 #llama 3.1
 graph = load_llama31_rag_pipeline()
 # END OF LLAMA 3.1 LOGIC'''
+
+'''# START OF LLAMA 2.7 LOGIC
+#llama 2.7
+graph = load_llama27_rag_pipeline()
+# END OF LLAMA 2.7 LOGIC'''
 
 
 # 30 questions

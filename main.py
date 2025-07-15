@@ -20,7 +20,7 @@ from rag_pipelines.llama27_rag_pipeline import load_llama27_rag_pipeline
 
 # UNCOMMENT THE CODE FOR THE MODEL THAT YOU ARE NOT USING BEFORE RUNNING
 
-#START OF GRANITE MODEL LOGIC
+'''#START OF GRANITE MODEL LOGIC
 #granite
 graph = load_granite_rag_pipline()
 
@@ -58,7 +58,7 @@ while True:
 
 
     print("\nAnswer:", result["answer"])
-#END OF LLAMA 3.1 MODEL LOGIC
+#END OF LLAMA 3.1 MODEL LOGIC'''
 
 
 #START OF LLAMA 2.7 MODEL LOGIC

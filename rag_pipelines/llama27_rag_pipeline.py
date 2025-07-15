@@ -3,16 +3,17 @@ from langchain_community.document_loaders import PyPDFLoader
 from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import Chroma
-#from langchain_community.embeddings import HuggingFaceEmbeddings
-from langchain_community.chat_models import ChatOpenAI
+from langchain_community.embeddings import HuggingFaceEmbeddings
 from langgraph.graph import START, StateGraph
 from typing_extensions import List, TypedDict
 from langchain_community.llms import LlamaCpp
 from langchain_huggingface import HuggingFaceEmbeddings
-import time
-import torch
-from transformers import AutoModelForCausalLM, AutoTokenizer
 from langchain_community.llms import Ollama
+
+'''
+Code from langchain's Build a RAG App documentation
+https://python.langchain.com/docs/tutorials/rag/
+'''
 
 def load_llama27_rag_pipeline(): 
 # load and chunk contents of thepytohnPDF
@@ -45,6 +46,10 @@ def load_llama27_rag_pipeline():
         n_ctx=2048,
         n_gpu_layers=1,  
     )
+    
+
+    '''llm = Ollama(model="llama2.7", base_url="http://127.0.0.1:11434")'''
+
         
     # Define state for application
     class State(TypedDict):
