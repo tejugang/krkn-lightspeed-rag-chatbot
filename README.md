@@ -39,7 +39,7 @@ Ensure that ollama is running in the background
 [User guide to the evaluation pipeline](https://docs.google.com/document/d/1Z8KLLzhMC8zJf-aQJg4LkeROuzAB71A5U3-HyiICo8g/edit?tab=t.0)
 
 1. open eval.py and uncomment the code for the model you are evaluating
-2. edit the email field on line 121
+2. edit the email field on line 121 with the email that evaluation metrics should be sent to
 3. after the script runs, open the json file (file name is on line 125)
 4. copy the entire json file and open the [Evaluation Pipeline Endpoint](https://evaluation-api-rhsc-ai.apps.int.spoke.preprod.us-east-1.aws.paas.redhat.com/docs#/) (must connected to VPN). 
 5. make sure the json structure matches the required format in the endpoint and paste it in these three endpoints```/evaluate_context_retrieval```, ```evaluate_response```, and ```evaluate_all```
