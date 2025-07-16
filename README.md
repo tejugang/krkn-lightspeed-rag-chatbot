@@ -46,3 +46,5 @@ If using the llama 2.7 model, [download the model](https://huggingface.co/TheBlo
 4. copy the entire json file and open the [Evaluation Pipeline Endpoint](https://evaluation-api-rhsc-ai.apps.int.spoke.preprod.us-east-1.aws.paas.redhat.com/docs#/) (must connected to VPN). 
 5. make sure the json structure matches the required format in the endpoint and paste it in these three endpoints```/evaluate_context_retrieval```, ```evaluate_response```, and ```evaluate_all```
 6. evaluation metrics should be emailed to you
+
+[Evaluation data](https://drive.google.com/drive/folders/1pLRgeLMEEvxacZML3B7Ges5nnsJr4t-W?usp=drive_link)
