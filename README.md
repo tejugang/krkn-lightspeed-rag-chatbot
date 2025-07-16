@@ -40,6 +40,8 @@ If using the llama 2.7 model, [download the model](https://huggingface.co/TheBlo
 ## Evaluating the model
 [User guide to the evaluation pipeline](https://docs.google.com/document/d/1Z8KLLzhMC8zJf-aQJg4LkeROuzAB71A5U3-HyiICo8g/edit?tab=t.0)
 
+Note: The output of steps 1-3 are the files in the folder ```evaluationPipeline ```
+
 1. open eval.py and uncomment the code for the model you are evaluating
 2. edit the email field on line 121 with the email that evaluation metrics should be sent to
 3. after the script runs, open the json file (file name is on line 125)
