@@ -4,7 +4,7 @@ on:
   pull_request:
     types: [opened, reopened]
   issues:
-    types: [opened]
+    types: [opened, labeled]
 
 jobs:
   handle-pr:
@@ -105,28 +105,57 @@ jobs:
         with:
           script: |
             const issue = context.payload.issue;
+            const action = context.payload.action;
 
             // Add labels to indicate needs review
-            await github.rest.issues.addLabels({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: issue.number,
-              labels: ['needs-approval', 'needs-assignment']
-            });
+            if (action === 'opened') {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                labels: ['needs-triage']
+              });
 
-            // Post comment requesting approval from reviewers
-            const reviewers = ['tejugang']; 
-            const comment = `📋 New issue created! @${reviewers.join(' @')} - Please review this issue and:\n` +
-              '1. Approve if it is valid and aligns with project goals\n' +
-              '2. Assign to an appropriate team member\n' +
-              '3. Remove the `needs-approval` and `needs-assignment` labels once assigned\n\n' +
-              'The assigned person will then be able to create a PR to address this issue.';
+              // Post comment requesting approval from reviewers
+              const reviewers = ['tejugang']; 
+              const comment = `awaiting maintainer review! \n @${reviewers.join(' @')} Please review and approve this issue.`;
 
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: issue.number,
-              body: comment
-            });
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body: comment
+              });
 
-            console.log(`Issue #${issue.number} labeled and reviewers notified`)
+              console.log(`Issue #${issue.number} labeled and reviewers notified`) }
+            
+            if (action === 'labeled') {
+              if (context.payload.label.name !== 'triage/accepted') {
+                console.log(`Label ${context.payload.label.name} added - no action needed`);
+                return;
+              }
+              const labels = issue.labels.map(l => l.name);
+
+              if (labels.includes('kind/bug')) {
+                console.log(`Issue #${issue.number} is a bug - skipping auto assignment`);
+                return;
+              }
+
+
+              await github.rest.issues.addAssignees({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                assignees: [issue.user.login] 
+              });
+
+              const comment = `you've been assigned to this issue. Please submit a PR within 14 days.`;
+
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body: comment
+              });
+
+              console.log(`Issue #${issue.number} assigned to ${issue.user.login}`); }
