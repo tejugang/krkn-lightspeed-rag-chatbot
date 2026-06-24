@@ -1,8 +1,10 @@
 ---
 name: Bug Report
-description: File a bug report to help us improve krkn
-labels: ["kind/bug"]
+about: File a bug report to help us improve krkn
 title: "[BUG]: "
+labels: kind/bug
+assignees: ''
+
 ---
 
 ## Steps to Reproduce  
@@ -13,4 +15,4 @@ title: "[BUG]: "
 <!-- A clear description of what you expected to happen -->  
 
 ## Actual Behavior
-<!-- A clear description of what actually happened -->  
+<!-- A clear description of what actually happened -->
