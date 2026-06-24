@@ -84,14 +84,20 @@ jobs:
                 console.log(`Error removing label: ${error.message}`);
               }
 
-              const approvalComment = `This issue has been approved and is ready to be worked on...`;
-              
+              await github.rest.issues.addAssignees({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                assignees: [issue.user.login] 
+              });
+
+              const comment = `you've been assigned to this issue. Please submit a PR within 14 days.`;
+
               await github.rest.issues.createComment({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 issue_number: issue.number,
-                body: approvalComment
+                body: comment
               });
 
-              console.log(`Issue #${issue.number} approved.`);
-            }
+              console.log(`Issue #${issue.number} assigned to ${issue.user.login}`); }
