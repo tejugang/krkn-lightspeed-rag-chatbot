@@ -91,7 +91,8 @@ jobs:
                 assignees: [issue.user.login] 
               });
 
-              const comment = `you've been assigned to this issue. Please submit a PR within 14 days.`;
+              const comment = `This issue has been approved by a maintainer. @${issue.user.login} you've been assigned since you reported this issue — you get first priority! Please submit a PR within 14 days using Fixes #<issue_number> in the PR description. If no PR is submitted, the issue will be opened up for other contributors.`;
+
 
               await github.rest.issues.createComment({
                 owner: context.repo.owner,
