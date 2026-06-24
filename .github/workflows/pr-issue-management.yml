@@ -1,4 +1,4 @@
-name: PR and Issue Management
+name: Issue Management
 
 on:
   pull_request_target:
@@ -7,107 +7,6 @@ on:
     types: [opened, labeled]
 
 jobs:
-  handle-pr:
-    if: github.event_name == 'pull_request_target'
-    runs-on: ubuntu-latest
-    name: Check linked issue
-    permissions:
-      pull-requests: write
-      issues: read
-
-    steps:
-      - name: Check linked issue and assign reviewers
-        uses: nearform-actions/github-action-check-linked-issues@v1
-        id: check-linked-issues
-        with:
-          exclude-branches: "release/**, dependabot/**"
-      - name: Assign reviewers based on linked issue
-        uses: actions/github-script@v7
-        env:
-          LINKED_ISSUES_COUNT: ${{ steps.check-linked-issues.outputs.linked_issues_count }}
-          ISSUES_OUTPUT: ${{ steps.check-linked-issues.outputs.issues }}
-        with:
-          script: |
-            const pr = context.payload.pull_request;
-            const prCreator = pr.user.login;
-
-            const linkedIssueCount = parseInt(process.env.LINKED_ISSUES_COUNT || '0');
-            const issuesOutput = process.env.ISSUES_OUTPUT || '[]';
-
-            if (linkedIssueCount === 0) {
-              const comment = `Thanks for your contribution! This PR does not appear to have a linked issue. Please refer to our [contribution guidelines](CONTRIBUTING.md) for the proper PR process.`;
-
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: pr.number,
-                body: comment
-              });
-
-              console.log('No linked issue found - posted comment');
-              return;
-            }
-
-            // Check the first linked issue
-            const issues = JSON.parse(issuesOutput);
-
-            if (!issues || issues.length === 0) {
-              console.log('No issues in output despite count > 0');
-              return;
-            }
-
-            // Extract issue number - handle both "#123" and "123" formats
-            const issueRef = issues[0];
-            const issueNumber = parseInt(issueRef.replace('#', ''));
-
-            try {
-              const { data: issue } = await github.rest.issues.get({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: issueNumber
-              });
-
-              const issueAssignees = issue.assignees.map(a => a.login);
-
-              if (!issueAssignees.includes(prCreator)) {
-                const comment = `Thanks for your contribution! However, this PR is linked to issue #${issueNumber}, which is not assigned to you. Please refer to our [contribution guidelines](CONTRIBUTING.md). PRs should only be opened by contributors who are assigned to the linked issue.`;
-
-                await github.rest.issues.createComment({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  issue_number: pr.number,
-                  body: comment
-                });
-
-                console.log(`PR creator ${prCreator} is not assigned to issue #${issueNumber}`);
-                return;
-              }
-
-              // PR creator is assigned to the issue - assign reviewers
-              const reviewers = ['tejugang'];
-
-              await github.rest.pulls.requestReviewers({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                pull_number: pr.number,
-                reviewers: reviewers
-              });
-
-              console.log(`Assigned reviewers: ${reviewers.join(', ')}`);
-
-            } catch (error) {
-              console.error(`Error checking issue #${issueNumber}:`, error);
-
-              const comment = `Unable to verify the linked issue #${issueNumber}. Please ensure the issue exists and is properly configured.`;
-
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: pr.number,
-                body: comment
-              });
-            }
-
   handle-issue:
     if: github.event_name == 'issues'
     runs-on: ubuntu-latest
@@ -123,8 +22,25 @@ jobs:
             const issue = context.payload.issue;
             const action = context.payload.action;
 
-            // Add labels to indicate needs review
+            const labels = issue.labels ? issue.labels.map(l => l.name) : [];
+            const isBug = labels.includes('kind/bug');
+
+            // 1. Auto-Triage on Issue Open
             if (action === 'opened') {
+              
+              // Bug Bypass Flow
+              if (isBug) {
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issue.number,
+                  body: 'Thanks for reporting this bug! This issue has bypassed the standard triage requirement and is ready to be worked on immediately.'
+                });
+                console.log(`Issue #${issue.number} is a bug - bypassing triage.`);
+                return;
+              }
+
+              // Standard Triage Flow
               await github.rest.issues.addLabels({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
@@ -132,10 +48,12 @@ jobs:
                 labels: ['needs-triage']
               });
 
-              // Post comment requesting approval from reviewers
+              // Post comment and tag the reviewers
+              //const reviewers = ['chaitanyaenr', 'paigerube14', 'tsebastiani']; 
               const reviewers = ['tejugang']; 
-              const comment = `awaiting maintainer review! \n @${reviewers.join(' @')} Please review and approve this issue.`;
 
+              const comment = `Thanks for opening this issue! A maintainer will review it shortly. Please wait for approval before starting work on a PR. See our contribution guidelines for more details. \n\nCC: @${reviewers.join(' @')}`;
+              
               await github.rest.issues.createComment({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
@@ -143,35 +61,37 @@ jobs:
                 body: comment
               });
 
-              console.log(`Issue #${issue.number} labeled and reviewers notified`) }
+              console.log(`Issue #${issue.number} labeled and reviewers notified`);
+            }
             
+            // 2. Maintainer Approval Flow
             if (action === 'labeled') {
               if (context.payload.label.name !== 'triage/accepted') {
                 console.log(`Label ${context.payload.label.name} added - no action needed`);
                 return;
               }
-              const labels = issue.labels.map(l => l.name);
-
-              if (labels.includes('kind/bug')) {
-                console.log(`Issue #${issue.number} is a bug - skipping auto assignment`);
-                return;
+              
+              // Remove needs-triage
+              try {
+                await github.rest.issues.removeLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issue.number,
+                  name: 'needs-triage'
+                });
+                console.log(`Removed 'needs-triage' label from issue #${issue.number}`);
+              } catch (error) {
+                console.log(`Error removing label: ${error.message}`);
               }
 
-
-              await github.rest.issues.addAssignees({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: issue.number,
-                assignees: [issue.user.login] 
-              });
-
-              const comment = `you've been assigned to this issue. Please submit a PR within 14 days.`;
-
+              const approvalComment = `This issue has been approved and is ready to be worked on...`;
+              
               await github.rest.issues.createComment({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 issue_number: issue.number,
-                body: comment
+                body: approvalComment
               });
 
-              console.log(`Issue #${issue.number} assigned to ${issue.user.login}`); }
+              console.log(`Issue #${issue.number} approved.`);
+            }
