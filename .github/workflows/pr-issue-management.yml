@@ -51,7 +51,8 @@ jobs:
               });
 
               // Post comment and tag the reviewers
-              const reviewers = `@${context.repo.owner}/${process.env.REVIEWERS}`;
+              //const reviewers = `@${context.repo.owner}/${process.env.REVIEWERS}`;
+              const reviewers = `@${context.repo.owner}`;
 
               const comment = `Thanks for opening this issue! A maintainer will review it shortly. Please wait for approval before starting work on a PR. See our [contributing guidelines](https://krkn-chaos.dev/docs/contribution-guidelines/) for more details. \n\nCC: ${reviewers}`;
               
