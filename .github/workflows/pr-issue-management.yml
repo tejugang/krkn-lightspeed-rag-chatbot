@@ -87,7 +87,7 @@ jobs:
               } catch (error) {
                 console.log(`Error removing label: ${error.message}`);
               }
-
+            /*
               await github.rest.issues.addAssignees({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
@@ -96,7 +96,9 @@ jobs:
               });
 
               const comment = `This issue has been approved by a maintainer. @${issue.user.login} you've been assigned since you reported this issue — you get first priority! Please submit a PR within 14 days using Fixes #<issue_number> in the PR description. If no PR is submitted, the issue will be opened up for other contributors.`;
+            */
 
+              const comment = `This issue has been approved and assigned by a maintainer! If you are the assignee, please submit a PR within 14 days using Fixes #<issue_number> in the PR description. If no PR is submitted, the issue will be opened up for other contributors.`;
 
               await github.rest.issues.createComment({
                 owner: context.repo.owner,
