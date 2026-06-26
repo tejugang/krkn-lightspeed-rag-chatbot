@@ -23,27 +23,9 @@ jobs:
           script: |
             const issue = context.payload.issue;
             const action = context.payload.action;
-            
-            /*
-            const labels = issue.labels ? issue.labels.map(l => l.name) : [];
-            const isBug = labels.includes('kind/bug') || labels.includes('bug') ;
-            */
+
             // 1. Auto-Triage on Issue Open
             if (action === 'opened') {
-
-            /*
-              // Bug Bypass Flow
-              if (isBug) {
-                await github.rest.issues.createComment({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  issue_number: issue.number,
-                  body: 'Thanks for reporting this bug! This issue has bypassed the standard triage requirement and is ready to be worked on immediately.'
-                });
-                console.log(`Issue #${issue.number} is a bug - bypassing triage.`);
-                return;
-              }
-            */
 
               // Standard Triage Flow (including bug issues)
               await github.rest.issues.addLabels({
@@ -86,17 +68,7 @@ jobs:
                 console.log(`Removed 'needs-triage' label from issue #${issue.number}`);
               } catch (error) {
                 console.log(`Error removing label: ${error.message}`);
-              }
-            /*
-              await github.rest.issues.addAssignees({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: issue.number,
-                assignees: [issue.user.login] 
-              });
-
-              const comment = `This issue has been approved by a maintainer. @${issue.user.login} you've been assigned since you reported this issue — you get first priority! Please submit a PR within 14 days using Fixes #<issue_number> in the PR description. If no PR is submitted, the issue will be opened up for other contributors.`;
-            */
+                }
 
               const comment = `This issue has been approved and assigned by a maintainer! If you are the assignee, please submit a PR within 14 days using Fixes #<issue_number> in the PR description. If no PR is submitted, the issue will be opened up for other contributors.`;
 
