@@ -23,13 +23,15 @@ jobs:
           script: |
             const issue = context.payload.issue;
             const action = context.payload.action;
-
+            
+            /*
             const labels = issue.labels ? issue.labels.map(l => l.name) : [];
             const isBug = labels.includes('kind/bug') || labels.includes('bug') ;
-
+            */
             // 1. Auto-Triage on Issue Open
             if (action === 'opened') {
-              
+
+            /*
               // Bug Bypass Flow
               if (isBug) {
                 await github.rest.issues.createComment({
@@ -41,8 +43,9 @@ jobs:
                 console.log(`Issue #${issue.number} is a bug - bypassing triage.`);
                 return;
               }
+            */
 
-              // Standard Triage Flow
+              // Standard Triage Flow (including bug issues)
               await github.rest.issues.addLabels({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
@@ -51,8 +54,7 @@ jobs:
               });
 
               // Post comment and tag the reviewers
-              //const reviewers = `@${context.repo.owner}/${process.env.REVIEWERS}`;
-              const reviewers = `@${context.repo.owner}`;
+              const reviewers = `@${context.repo.owner}/${process.env.REVIEWERS}`;
 
               const comment = `Thanks for opening this issue! A maintainer will review it shortly. Please wait for approval before starting work on a PR. See our [contributing guidelines](https://krkn-chaos.dev/docs/contribution-guidelines/) for more details. \n\nCC: ${reviewers}`;
               
