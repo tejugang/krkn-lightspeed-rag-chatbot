@@ -8,4 +8,9 @@ on:
 
 jobs: 
     issue-management: 
-        uses: tejugang/test-actions/.github/workflows/issue-management.yml@main
+      permissions: 
+        issues: write
+        contents: read
+        pull-requests: write
+      uses: tejugang/test-actions/.github/workflows/issue-management.yml@main
+        
