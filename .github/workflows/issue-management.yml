@@ -8,4 +8,4 @@ on:
 
 jobs: 
     issue-management: 
-        uses: tejugang/krkn-lightspeed-rag-chatbot/.github/workflows/issue-management.yml@main
+        uses: tejugang/test-actions/.github/workflows/issue-management.yml@main
