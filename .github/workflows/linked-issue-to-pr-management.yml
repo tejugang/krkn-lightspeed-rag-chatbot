@@ -13,12 +13,12 @@ jobs:
         issues: write
         contents: read
         pull-requests: write
-      uses: tejugang/test-actions/.github/workflows/linked-issue-to-PR-management.yml@main
+      uses: tejugang/test-actions/.github/workflows/linked-issue-to-pr-management.yml@main
     handle-pr: 
       if: github.event_name == 'pull_request_target'
       permissions: 
         issues: write
         contents: read
         pull-requests: write
-      uses: tejugang/test-actions/.github/workflows/linked-issue-to-PR-management.yml@main
+      uses: tejugang/test-actions/.github/workflows/linked-issue-to-pr-management.yml@main
         
