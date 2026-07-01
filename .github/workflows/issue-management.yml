@@ -7,10 +7,16 @@ on:
     types: [opened, labeled]
 
 jobs: 
-    issue-management: 
+    handle-issue: 
       permissions: 
         issues: write
         contents: read
         pull-requests: write
-      uses: tejugang/test-actions/.github/workflows/issue-management.yml@main
+      uses: krkn-chaos/actions/.github/workflows/linked-issue-to-PR-management.yml@main
+    handle-pr: 
+      permissions: 
+        issues: write
+        contents: read
+        pull-requests: write
+      uses: krkn-chaos/actions/.github/workflows/linked-issue-to-PR-management.yml@main
         
