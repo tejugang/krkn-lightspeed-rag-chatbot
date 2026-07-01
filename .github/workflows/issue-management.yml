@@ -12,11 +12,11 @@ jobs:
         issues: write
         contents: read
         pull-requests: write
-      uses: krkn-chaos/actions/.github/workflows/linked-issue-to-PR-management.yml@main
+      uses: tejugang/test-actions/.github/workflows/linked-issue-to-PR-management.yml@main
     handle-pr: 
       permissions: 
         issues: write
         contents: read
         pull-requests: write
-      uses: krkn-chaos/actions/.github/workflows/linked-issue-to-PR-management.yml@main
+      uses: tejugang/test-actions/.github/workflows/linked-issue-to-PR-management.yml@main
         
