@@ -6,9 +6,8 @@ on:
 
 
 jobs: 
-    handle-issue: 
-      add-label:
-        permissions:
-          issues: write
-          pull-request: write
+    add-label:
+      permissions:
+        issues: write
+        pull-request: write
       uses: tejugang/test-actions/.github/workflows/label-via-comment.yml@main
