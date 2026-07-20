@@ -9,5 +9,5 @@ jobs:
     add-label:
       permissions:
         issues: write
-        pull-request: write
+        pull-requests: write
       uses: tejugang/test-actions/.github/workflows/label-via-comment.yml@main
