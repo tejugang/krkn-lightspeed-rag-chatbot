@@ -1,4 +1,4 @@
-name: Issue Management
+name: Label via slash
 
 on:
   issue_comment:
