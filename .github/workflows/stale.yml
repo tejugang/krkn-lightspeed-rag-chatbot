@@ -1,7 +1,10 @@
 name: Stale
 on:
-  issues:
-    types: [opened]
+  # Runs daily at midnight UTC
+  schedule:
+    - cron: '0 0 * * *'
+  # Allows manual triggering from the Actions tab for testing
+  workflow_dispatch:
 jobs:
   close-issue:
     permissions:
