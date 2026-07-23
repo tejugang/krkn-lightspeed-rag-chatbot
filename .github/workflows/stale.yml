@@ -6,7 +6,7 @@ on:
   # Allows manual triggering from the Actions tab for testing
   workflow_dispatch:
 jobs:
-  close-issue:
+  stale-check:
     permissions:
       issues: write
       pull-requests: write
