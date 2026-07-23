@@ -1,7 +1,7 @@
 name: Stale
 on:
-  issue_comment:
-    types: [created]
+  issues:
+    types: [opened]
 jobs:
   close-issue:
     permissions:
