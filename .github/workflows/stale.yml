@@ -9,5 +9,6 @@ jobs:
   close-issue:
     permissions:
       issues: write
+      pull-requests: write
     uses: tejugang/test-actions/.github/workflows/stale.yml@main
     secrets: inherit
