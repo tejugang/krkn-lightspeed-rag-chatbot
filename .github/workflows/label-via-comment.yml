@@ -1,0 +1,13 @@
+name: Label via slash
+
+on:
+  issue_comment:
+    types: [created]
+
+
+jobs: 
+    add-label:
+      permissions:
+        issues: write
+        pull-requests: write
+      uses: tejugang/test-actions/.github/workflows/label-via-comment.yml@main

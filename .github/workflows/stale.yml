@@ -1,0 +1,14 @@
+name: Stale
+on:
+  # Runs daily at midnight UTC
+  schedule:
+    - cron: '0 0 * * *'
+  # Allows manual triggering from the Actions tab for testing
+  workflow_dispatch:
+jobs:
+  stale-check:
+    permissions:
+      issues: write
+      pull-requests: write
+    uses: tejugang/test-actions/.github/workflows/stale.yml@main
+    secrets: inherit
